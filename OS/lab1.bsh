@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+name="sejuti"
+echo "hello $name!"
+echo "I am in $(cd temp && pwd)"

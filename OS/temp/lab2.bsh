@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+directory="$(pwd)"
+echo "In the directory $directory the c/ c++ files are-"
+files=$(find . -type f -name "*.c" -o -name "*.cpp" )
+echo "$(du -h $files && wc -l $files)"
