@@ -5,7 +5,7 @@ int main()
 {
     int numProcesses;
     vector<int> burstTime, priority, arrivalTime;
-    freopen("input.txt","r",stdin);
+    freopen("input2.txt","r",stdin);
 
     cin >> numProcesses;
     
@@ -18,10 +18,26 @@ int main()
         arrivalTime.push_back(c);
     }
 
-    // for(int i=0; i<numProcesses; i++)
-    // {
-    //     cout << burstTime[i] << " " << priority[i] << endl;
-    // }
+// sorting based on the shortest job
+
+    vector<int> index_sorted(numProcesses);
+    for (int i = 0; i < numProcesses; i++) {
+        index_sorted[i] = i;
+    }
+
+    // Sorting based on burst time and arrival time
+    int temp = 0;
+    for (int i = 0; i < numProcesses; i++) {
+    //cout << "temp: " << temp << " i=" << i+1 << "   "<< endl;
+        for (int j = i + 1; j < numProcesses; j++) {
+
+            if ((arrivalTime[index_sorted[i]] >= arrivalTime[index_sorted[j]] || arrivalTime[index_sorted[j]] < temp) &&
+                burstTime[index_sorted[i]] > burstTime[index_sorted[j]]) {
+                swap(index_sorted[i], index_sorted[j]);
+            }
+        }
+        temp = max(temp, arrivalTime[index_sorted[i]])+ burstTime[index_sorted[i]];
+    }
 
     int finishTime[numProcesses];
     int startTime[numProcesses];
@@ -30,14 +46,14 @@ int main()
     {
         if(i==0)
         {
-            startTime[i]= arrivalTime[i];
-            finishTime[i]= arrivalTime[i]+ burstTime[i];
+            startTime[i]= arrivalTime[index_sorted[i]];
+            finishTime[i]= arrivalTime[index_sorted[i]]+ burstTime[index_sorted[i]];
         }
         else
         {
             // precondition: assumes that the processes are sorted based on arrival time
-            startTime[i]= max(arrivalTime[i], finishTime[i-1]);
-            finishTime[i]= startTime[i]+ burstTime[i];
+            startTime[i]= max(arrivalTime[index_sorted[i]], finishTime[i-1]);
+            finishTime[i]= startTime[i]+ burstTime[index_sorted[i]];
         }
     }
 
@@ -49,16 +65,16 @@ int main()
     {
       if(i==0)
       {
-        cout << startTime[i] << "|---p" << i+1 << "---|" << finishTime[i] ;
+        cout << startTime[i] << "|---p" << index_sorted[i]+1 << "---|" << finishTime[i] ;
       }
       else if(startTime[i]==finishTime[i-1])
         {
-        cout << "|---p" << i+1 << "---|" << finishTime[i] ;
+        cout << "|---p" << index_sorted[i]+1 << "---|" << finishTime[i] ;
         }
         else
         {
             cout << "|---#---|" << startTime[i];
-            cout << "|---p" << i+1 << "---|" << finishTime[i] ;
+            cout << "|---p" << index_sorted[i]+1 << "---|" << finishTime[i] ;
         }
     }
     cout << "|" << endl << endl;
@@ -68,8 +84,8 @@ int main()
     int turnaround[numProcesses], waiting_time[numProcesses];
     for(int i=0; i<numProcesses; i++)
     {
-        turnaround[i]= finishTime[i]- arrivalTime[i];
-        waiting_time[i]= turnaround[i]- burstTime[i];
+        turnaround[i]= finishTime[i]- arrivalTime[index_sorted[i]];
+        waiting_time[i]= turnaround[i]- burstTime[index_sorted[i]];
     }
 
     int total=0;
