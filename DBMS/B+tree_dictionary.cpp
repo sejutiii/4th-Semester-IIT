@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int numPointers, numkeys; //numkeys= numPointers-1
+int numPointers, numkeys; //maximum number of keys and node pointers
 int jumps= 0; //the number of hops needed to find a word
 
 struct Node
@@ -21,7 +21,7 @@ Node *createNewNode() // creates a new node
     newNode-> numCurrentKeys=0;
     newNode-> parent= nullptr;
     newNode-> next = nullptr;
-    newNode-> nodePointers= new Node *[numPointers +1]; //
+    newNode-> nodePointers= new Node *[numPointers +1]; 
     for(int i=0; i<numPointers; i++)
     {
         newNode->nodePointers[i]= nullptr; //initializing node pointers as null
@@ -47,7 +47,7 @@ void updateRootNode(Node *node, Node* leftChild, Node* rightChild, string word) 
     root =  node;
 }
 
-Node *searchInsertionNode(Node *node, string word) //searching the correct node to insert a new value
+Node *searchInsertionNode(Node *node, string word) //searching the correct node for a word
 {
     while(!node-> isLeaf)
     {
@@ -94,7 +94,7 @@ void shiftUp(Node *parent, Node* leftChild, Node *rightChild, string word)
     rightChild->parent= parent;
     mergeWithParent(parent, rightChild, word);
 
-    if(parent->numCurrentKeys == numPointers) // overflow
+    if(parent->numCurrentKeys == numPointers) 
     {
         // overflow -> have to split parent node
         Node *splitNode= createNewNode();
@@ -111,7 +111,7 @@ void shiftUp(Node *parent, Node* leftChild, Node *rightChild, string word)
                 splitNode->nodePointers[0]->parent= splitNode;
             }
 
-            // inserting the right nodes
+            // inserting the right pointers
             splitNode->nodePointers[splitNode_index+1]= parent->nodePointers[i+1];
             splitNode->nodePointers[splitNode_index+1]->parent= splitNode;
             splitNode_index++;
