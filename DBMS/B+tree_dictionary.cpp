@@ -47,8 +47,12 @@ void updateRootNode(Node *node, Node* leftChild, Node* rightChild, string word) 
     root =  node;
 }
 
-Node *searchInsertionNode(Node *node, string word) //searching the correct node for a word
+Node *searchInsertionNode(Node *node, string word, bool print) //searching the correct node for a word
 {
+    if(print == true)
+    {
+        cout << node-> words[0];
+    }
     while(!node-> isLeaf)
     {
         int i;
@@ -57,6 +61,10 @@ Node *searchInsertionNode(Node *node, string word) //searching the correct node 
             if(word < node->words[i]) break;
         }
         node= node->nodePointers[i];
+        if(print == true)
+        {
+            cout << " -> " << node->words[0] ;
+        }
         jumps++;
     }
     return node;
@@ -117,14 +125,14 @@ void shiftUp(Node *parent, Node* leftChild, Node *rightChild, string word)
             splitNode_index++;
         }
         splitNode->numCurrentKeys = totalKeys/2;
-        parent -> numCurrentKeys -= (totalKeys/2);
-        shiftUp(parent->parent, parent, splitNode, parent->words[parent->numCurrentKeys-1]);
+        parent -> numCurrentKeys -= (totalKeys/2+1);
+        shiftUp(parent->parent, parent, splitNode, parent->words[parent->numCurrentKeys]);
     }
 }
 
 void insertNewWord(string word, string meaning)
 {
-    Node *insertionNode= searchInsertionNode(root, word);
+    Node *insertionNode= searchInsertionNode(root, word, false); // not printing -> bool false
     int keyIndex= insertionNode->numCurrentKeys-1;
 
     while(keyIndex > -1)
@@ -158,7 +166,7 @@ void insertNewWord(string word, string meaning)
 
         splitNode->next = insertionNode->next;
         insertionNode->next= splitNode;
-        shiftUp(insertionNode->parent, insertionNode, splitNode, word); //balancing with the parent node 
+        shiftUp(insertionNode->parent, insertionNode, splitNode, splitNode->words[0]); //balancing with the parent node 
     }
 }
 
@@ -193,9 +201,9 @@ bool buildTree()
 void search_word_meaning()
 {
   //  bool flag= true;
-    while(true)
-    {
-        cout << "Enter x to terminate" << endl;
+    // while(true)
+    // {
+    //     cout << "Enter x to terminate" << endl;
         cout << "Enter a word: ";
         string word;
         cin >> word;
@@ -205,15 +213,15 @@ void search_word_meaning()
             word[i]= tolower(word[i]);
         }
 
-        if(word == "x")
-        {
-            cout << "Terminated successfully!" << endl;
-            return;
-        }
+        // if(word == "x")
+        // {
+        //     cout << "Terminated successfully!" << endl;
+        //     return;
+        // }
 
         jumps=0;
 
-        Node *leaf= searchInsertionNode(root, word);
+        Node *leaf= searchInsertionNode(root, word, true);
         int i;
 
         for(i=0; i<leaf->numCurrentKeys; i++)
@@ -224,9 +232,22 @@ void search_word_meaning()
         if(i== leaf->numCurrentKeys) 
             cout << "Sorry! No such word found!" << endl;
         else
-            cout << endl << word << " -" << leaf->meanings[i] << endl << endl;
-        cout << "Number of hops= " << jumps << endl << endl;
-    }
+
+
+           cout << endl << word << " -" << leaf->meanings[i] << endl << endl;
+           cout << "Number of hops= " << jumps << endl << endl;
+            // cout << "The output is printed in the file output.txt" << endl;
+            // ofstream file;
+            // file.open("output.txt");
+
+            // if(!file)
+            // {
+            //     return;
+            // }
+            // file << word << " -" << leaf ->meanings[i] << endl << endl;
+            // file << "Number of hops= " << jumps << endl << endl;
+            // file.close();
+   // }
 }
 
 int main()
