@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
 using namespace std;
 
 struct Process {
@@ -11,12 +15,14 @@ struct Process {
     int finishTime;
     int waitingTime;
     int turnaroundTime;
-
 };
 
 struct ComparePriority {
     bool operator()(const Process& p1, const Process& p2) {
-        return p1.priority > p2.priority; 
+        if (p1.priority == p2.priority) {
+            return p1.arrivalTime > p2.arrivalTime;
+        }
+        return p1.priority > p2.priority;
     }
 };
 
@@ -43,20 +49,20 @@ void priorityScheduling(vector<Process>& processes) {
             Process current = pq.top();
             pq.pop();
 
-            int index = current.id;
-            processes[index].remainingTime--;
+            if (current.startTime == -1) {
+                current.startTime = currentTime;
+            }
 
+            current.remainingTime--;
             currentTime++;
 
-            if (processes[index].remainingTime == 0) {
-                processes[index].finishTime = currentTime;
-                processes[index].turnaroundTime = processes[index].finishTime - processes[index].arrivalTime;
-                processes[index].waitingTime = processes[index].turnaroundTime - processes[index].burstTime;
+            if (current.remainingTime == 0) {
+                current.finishTime = currentTime;
+                current.turnaroundTime = current.finishTime - current.arrivalTime;
+                current.waitingTime = current.turnaroundTime - current.burstTime;
+                cout << "Process " << current.id << " completed at time " << currentTime << endl;
                 completed++;
-            }
-            
-            else {
-            
+            } else {
                 pq.push(current);
             }
         } else {
@@ -65,31 +71,25 @@ void priorityScheduling(vector<Process>& processes) {
     }
 
     cout << "Gantt chart:" << endl << endl;
-    cout << "|" ;
-    for(int i=0; i<numprocess; i++)
-    {
-      if(i==0)
-      {
-        cout << processes[i].arrivalTime << "|---p" << processes[i].id << "---|" << processes[i].finishTime ;
-      }
-      else if(processes[i].finishTime - processes[i-1].finishTime== processes[i].burstTime)
-        {
-        cout << "|---p" << processes[i].id << "---|" << processes[i].finishTime ;
-        }
-        else
-        {
-            cout << "|---#---|" << processes[i].finishTime-processes[i-1].finishTime;
-            cout << "|---p" << processes[i].id << "---|" << processes[i].finishTime ;
+    cout << "|";
+    for (int i = 0; i < numprocess; i++) {
+        if (i == 0) {
+            cout << processes[i].arrivalTime << "|---p" << processes[i].id << "---|" << processes[i].finishTime;
+        } else if (processes[i].finishTime - processes[i - 1].finishTime == processes[i].burstTime) {
+            cout << "|---p" << processes[i].id << "---|" << processes[i].finishTime;
+        } else {
+            cout << "|---#---|" << processes[i].startTime;
+            cout << "|---p" << processes[i].id << "---|" << processes[i].finishTime;
         }
     }
     cout << "|" << endl << endl;
 
-    double totalTurnaroundTime =0;
-    double totalWaitingTime=0;
+    double totalTurnaroundTime = 0;
+    double totalWaitingTime = 0;
 
     cout << "Process\tTurnaround Waiting\n";
     for (const auto& p : processes) {
-        cout <<p.id << "\t  " << p.turnaroundTime << "\t     " 
+        cout << p.id << "\t  " << p.turnaroundTime << "\t     "
              << p.waitingTime << '\n';
         totalTurnaroundTime += p.turnaroundTime;
         totalWaitingTime += p.waitingTime;
@@ -98,32 +98,29 @@ void priorityScheduling(vector<Process>& processes) {
     cout << "Average Turnaround Time: " << totalTurnaroundTime / numprocess << '\n';
     cout << "Average Waiting Time: " << totalWaitingTime / numprocess << '\n';
 }
-    
+
 int main() {
     vector<Process> processes;
 
     int numProcesses;
-    freopen("input.txt","r",stdin);
-
+    freopen("input.txt", "r", stdin);
     cin >> numProcesses;
-    
-    for(int i=0; i<numProcesses; i++)
-    {
+
+    for (int i = 0; i < numProcesses; i++) {
         int a, b, c;
         cin >> a >> b >> c;
         Process p;
-        p.id=i;
-        p.burstTime= a;
-        p.remainingTime=a;
-        p.priority=b;
-        p.arrivalTime=c;
-        p.startTime=0;
-        p.finishTime=0;
-        p.waitingTime=0;
-        p.turnaroundTime=0;
+        p.id = i;
+        p.burstTime = a;
+        p.remainingTime = a;
+        p.priority = b;
+        p.arrivalTime = c;
+        p.startTime = -1;
+        p.finishTime = -1;
+        p.waitingTime = 0;
+        p.turnaroundTime = 0;
 
         processes.push_back(p);
-    
     }
 
     priorityScheduling(processes);
